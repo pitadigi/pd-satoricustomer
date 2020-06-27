@@ -38,10 +38,10 @@ global with sharing class SatoriCustomer {
         String satori = (String)m.get('Satori');
 
         // 取引先責任者をメールアドレスで検索する
-        List<Contact> lstc = [SELECT Id,Satori__c,Tags__c FROM Contact WHERE Email=:email ORDER BY SystemModStamp DESC];
+        List<Contact> lstc = [SELECT Id,SatoriUrl__c,SatoriTags__c FROM Contact WHERE Email=:email ORDER BY SystemModStamp DESC];
         if (lstc.size() != 0) {
-            lstc[0].Satori__c = satori;
-            lstc[0].Tags__c = tags;
+            lstc[0].SatoriUrl__c = satori;
+            lstc[0].SatoriTags__c = tags;
             try {
                 update lstc[0];
             }
@@ -52,10 +52,10 @@ global with sharing class SatoriCustomer {
         }
         // リードをメールアドレスで検索する
         else {
-            List<Lead> lstl = [SELECT Id,Satori__c,Tags__c FROM Lead WHERE Email=:email ORDER BY SystemModStamp DESC];
+            List<Lead> lstl = [SELECT Id,SatoriUrl__c,SatoriTags__c FROM Lead WHERE Email=:email ORDER BY SystemModStamp DESC];
             if (lstl.size() != 0) {
-                lstl[0].Satori__c = satori;
-                lstl[0].Tags__c = tags;
+                lstl[0].SatoriUrl__c = satori;
+                lstl[0].SatoriTags__c = tags;
 
                 try {
                     update lstl[0];
@@ -71,8 +71,8 @@ global with sharing class SatoriCustomer {
                 l.LastName = lastName;
                 l.Email = email;
                 l.Company = company;
-                l.Tags__c = tags;
-                l.Satori__c = satori;
+                l.SatoriUrl__c = satori;
+                l.SatoriTags__c = tags;
 
                 try {
                     insert l;
