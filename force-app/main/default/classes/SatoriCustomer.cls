@@ -73,6 +73,7 @@ global with sharing class SatoriCustomer {
                 l.Company = company;
                 l.SatoriUrl__c = satori;
                 l.SatoriTags__c = tags;
+                l.LeadSource = 'Webサイト';
 
                 try {
                     insert l;
