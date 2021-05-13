@@ -1,5 +1,5 @@
-@RestResource(urlMapping='/satoricustomer/*')
-global with sharing class SatoriCustomer {
+@RestResource(urlMapping='/macustomer/*')
+global with sharing class pdSatoriCustomer {
     /**
      * SATORIのカスタマー情報をSalesforceのリード、取引先責任者に登録する
      * メールアドレスで取引先責任者を検索し、ヒットしたらSatori__cにSATORIカスタマーURLを設定する

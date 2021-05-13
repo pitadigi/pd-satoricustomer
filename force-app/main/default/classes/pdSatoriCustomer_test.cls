@@ -1,5 +1,5 @@
 @isTest
-class test_SatoriCustomer {
+class pdSatoriCustomer_test {
     @isTest
     static void test_doPost_NotExistsLead() {
         System.JSONGenerator j = JSON.createGenerator(false);
@@ -27,7 +27,7 @@ class test_SatoriCustomer {
         RestContext.request = req;
         RestContext.response = res;
 
-        String ret = SatoriCustomer.doPost(param.customer);
+        String ret = pdSatoriCustomer.doPost(param.customer);
 
         Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(ret);
         Boolean result = (Boolean)m.get('result');
@@ -72,7 +72,7 @@ class test_SatoriCustomer {
         RestContext.request = req;
         RestContext.response = res;
 
-        String ret = SatoriCustomer.doPost(param.customer);
+        String ret = pdSatoriCustomer.doPost(param.customer);
 
         Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(ret);
         Boolean result = (Boolean)m.get('result');
@@ -116,7 +116,7 @@ class test_SatoriCustomer {
         RestContext.request = req;
         RestContext.response = res;
 
-        String ret = SatoriCustomer.doPost(param.customer);
+        String ret = pdSatoriCustomer.doPost(param.customer);
 
         Map<String, Object> m = (Map<String, Object>)JSON.deserializeUntyped(ret);
         Boolean result = (Boolean)m.get('result');
