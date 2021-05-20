@@ -1,10 +1,8 @@
 @RestResource(urlMapping='/macustomer/*')
 global with sharing class pdSatoriCustomer {
     /**
-     * SATORIのカスタマー情報をSalesforceのリード、取引先責任者に登録する
-     * メールアドレスで取引先責任者を検索し、ヒットしたらSatori__cにSATORIカスタマーURLを設定する
-     * 取引先責任者がヒットしなければリードを検索し、存在したらSatori__cにSATORIカスタマーURLを設定する
-     * リードに存在しなければリードを作成する
+     * SATORIのカスタマー情報をSalesforceのリードに登録する
+     * 同じメールアドレスのリード、取引先責任者が存在する場合は、該当リード、取引先責任者を重複リード、重複取引先責任者として登録する
      * @param customer
      * SATORIカスタマー情報はJSON文字列で以下のデータが受け渡される
      * {
@@ -12,6 +10,7 @@ global with sharing class pdSatoriCustomer {
      *   LastName: 姓
      *   Email: メールアドレス
      *   Company: 会社名
+     *   Memo: お問い合わせ内容
      *   Tags: SATORIタグ
      *   Satori: SATORI URL
      * }
@@ -34,59 +33,41 @@ global with sharing class pdSatoriCustomer {
         String lastName = (String)m.get('LastName');
         String email = (String)m.get('Email');
         String company = (String)m.get('Company');
+        String memo = (String)m.get('Memo');
         String tags = (String)m.get('Tags');
         String satori = (String)m.get('Satori');
-
+        
         // 取引先責任者をメールアドレスで検索する
-        List<Contact> lstc = [SELECT Id,SatoriUrl__c,SatoriTags__c FROM Contact WHERE Email=:email ORDER BY SystemModStamp DESC];
-        if (lstc.size() != 0) {
-            lstc[0].SatoriUrl__c = satori;
-            lstc[0].SatoriTags__c = tags;
-            try {
-                update lstc[0];
-            }
-            catch(DmlException e) {
-                result = false;
-                message = e.getMessage();
-            }
-        }
+        List<Contact> lstc = [SELECT Id FROM Contact WHERE Email=:email ORDER BY SystemModStamp DESC];
         // リードをメールアドレスで検索する
-        else {
-            List<Lead> lstl = [SELECT Id,SatoriUrl__c,SatoriTags__c FROM Lead WHERE Email=:email ORDER BY SystemModStamp DESC];
-            if (lstl.size() != 0) {
-                lstl[0].SatoriUrl__c = satori;
-                lstl[0].SatoriTags__c = tags;
+        List<Lead> lstl = [SELECT Id FROM Lead WHERE Email=:email ORDER BY SystemModStamp DESC];
 
-                try {
-                    update lstl[0];
-                }
-                catch(DmlException e) {
-                    result = false;
-                    message = e.getMessage();
-                }
-            }
-            else {
-                Lead l = new Lead();
-                l.FirstName = firstName;
-                l.LastName = lastName;
-                l.Email = email;
-                l.Company = company;
-                l.SatoriUrl__c = satori;
-                l.SatoriTags__c = tags;
-                l.LeadSource = 'Webサイト';
+        Lead l = new Lead();
+        l.FirstName = firstName;
+        l.LastName = lastName;
+        l.Email = email;
+        l.Company = company;
+        l.Description = memo;
+        l.SatoriUrl__c = satori;
+        l.SatoriTags__c = tags;
+        l.LeadSource = 'Webサイト';
+        if (lstc.size() != 0) {
+            l.DuplicatedContact__c = lstc[0].Id;
+        }
+        if (lstl.size() != 0) {
+            l.DuplicatedLead__c = lstl[0].Id;
+        }
 
-                Database.DMLOptions dmo = new Database.DMLOptions();
-                dmo.assignmentRuleHeader.useDefaultRule= true;
-                l.setOptions(dmo);
+        Database.DMLOptions dmo = new Database.DMLOptions();
+        dmo.assignmentRuleHeader.useDefaultRule= true;
+        l.setOptions(dmo);
 
-                try {
-                    insert l;
-                }
-                catch(DmlException e) {
-                    result = false;
-                    message = e.getMessage();
-                }
-            }
+        try {
+            insert l;
+        }
+        catch(DmlException e) {
+            result = false;
+            message = e.getMessage();
         }
 
         j.writeBooleanField('result', result);
