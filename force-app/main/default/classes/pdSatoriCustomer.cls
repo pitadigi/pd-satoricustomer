@@ -75,6 +75,10 @@ global with sharing class pdSatoriCustomer {
                 l.SatoriTags__c = tags;
                 l.LeadSource = 'Webサイト';
 
+                Database.DMLOptions dmo = new Database.DMLOptions();
+                dmo.assignmentRuleHeader.useDefaultRule= true;
+                l.setOptions(dmo);
+
                 try {
                     insert l;
                 }
